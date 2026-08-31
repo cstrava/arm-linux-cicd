@@ -26,3 +26,11 @@ Run all checks with:
 ```bash
 cd app
 make quality
+
+## ARM Cross-Compilation
+
+The application can also be cross-compiled for ARM Linux.
+
+```bash
+cd app
+make arm
