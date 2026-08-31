@@ -1,10 +1,18 @@
 CC = gcc
+ARM_CC = arm-linux-gnueabihf-gcc
+
 CFLAGS = -Wall -Wextra -Werror
+
 TARGET = sensor-service
+ARM_TARGET = sensor-service-arm
+
 SRC = src/main.c
 
 all:
 	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
+
+arm:
+	$(ARM_CC) $(CFLAGS) $(SRC) -o $(ARM_TARGET)
 
 test: all
 	cd ../tests && ./test_sensor_service.sh
@@ -19,4 +27,4 @@ static-analysis:
 quality: format-check static-analysis test
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGET) $(ARM_TARGET)
