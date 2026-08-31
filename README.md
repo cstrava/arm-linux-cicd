@@ -34,3 +34,12 @@ The application can also be cross-compiled for ARM Linux.
 ```bash
 cd app
 make arm
+
+## Docker Build Environment
+
+The project provides a Docker image containing the tools required for local validation and ARM cross-compilation.
+
+Build the image with:
+
+```bash
+docker build -t arm-linux-ci:dev -f docker/Dockerfile .
