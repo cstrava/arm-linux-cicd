@@ -53,3 +53,9 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# Project-specific files
+app/sensor-service
+
+# IDE
+.vscode/
