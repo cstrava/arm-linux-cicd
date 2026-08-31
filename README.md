@@ -16,3 +16,13 @@ Supported commands:
 ./sensor-service
 ./sensor-service --health
 ./sensor-service --version
+
+## Code Quality
+
+The project includes automated local checks for formatting, static analysis and functional tests.
+
+Run all checks with:
+
+```bash
+cd app
+make quality
