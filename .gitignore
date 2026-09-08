@@ -57,6 +57,10 @@ dkms.conf
 # Project-specific files
 app/sensor-service
 app/sensor-service-arm
+app/sensor-service-arm64
 
 # IDE
 .vscode/
+
+# QEMU images
+qemu/images/
