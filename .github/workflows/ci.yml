@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+
+  push:
+    branches:
+      - develop
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build CI Docker image
+        run: |
+          docker build \
+            -t arm-linux-ci:ci \
+            -f docker/Dockerfile .
+
+      - name: Run code quality checks
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            arm-linux-ci:ci \
+            bash -c "cd app && make quality"
+
+      - name: Build ARM application
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            arm-linux-ci:ci \
+            bash -c "cd app && make arm"
+
+      - name: Verify ARM binary
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            arm-linux-ci:ci \
+            bash -c "cd app && file sensor-service-arm && file sensor-service-arm | grep -q ARM"
+
+      - name: Upload ARM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sensor-service-arm
+          path: app/sensor-service-arm
