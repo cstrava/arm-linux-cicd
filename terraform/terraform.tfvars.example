@@ -1,7 +1,0 @@
-repo_url = "https://github.com/YOUR_USERNAME/arm-linux-cicd"
-
-runner_token = "YOUR_RUNNER_TOKEN"
-
-runner_name = "arm-linux-runner"
-
-runner_labels = "arm-linux,qemu"
