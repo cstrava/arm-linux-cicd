@@ -12,6 +12,14 @@ VERSION_FILE="VERSION"
 
 REMOTE_BASE="/opt/sensor-service"
 
+SSH_CMD="ssh"
+SCP_CMD="scp"
+
+if [ -n "${SSHPASS:-}" ]; then
+    SSH_CMD="sshpass -e ssh"
+    SCP_CMD="sshpass -e scp"
+fi
+
 if [ ! -f "$BINARY" ]; then
     echo "ARM64 binary not found: $BINARY"
     echo "Run 'make arm64' first."
@@ -32,15 +40,19 @@ VERSION=$(cat "$VERSION_FILE")
 
 echo "Deploying sensor-service version $VERSION..."
 
-scp -P "$SSH_PORT" \
+$SCP_CMD -o StrictHostKeyChecking=no \
+    -P "$SSH_PORT" \
     "$BINARY" \
     "$SSH_USER@$SSH_HOST:/tmp/sensor-service"
 
-scp -P "$SSH_PORT" \
+$SCP_CMD -o StrictHostKeyChecking=no \
+    -P "$SSH_PORT" \
     "$SERVICE_FILE" \
     "$SSH_USER@$SSH_HOST:/tmp/sensor-service.service"
 
-ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
+$SSH_CMD -o StrictHostKeyChecking=no \
+    -p "$SSH_PORT" \
+    "$SSH_USER@$SSH_HOST" \
     VERSION="$VERSION" \
     REMOTE_BASE="$REMOTE_BASE" \
     'bash -s' << 'EOF'

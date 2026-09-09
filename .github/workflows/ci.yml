@@ -2,14 +2,10 @@ name: CI
 
 on:
   pull_request:
-    branches:
-      - develop
-      - main
+    branches: [develop, main]
 
   push:
-    branches:
-      - develop
-      - main
+    branches: [develop, main]
 
 jobs:
   build-and-test:
@@ -32,22 +28,52 @@ jobs:
             arm-linux-ci:ci \
             bash -c "cd app && make quality"
 
-      - name: Build ARM application
+      - name: Build ARM64 application
         run: |
           docker run --rm \
             -v "$PWD:/workspace" \
             arm-linux-ci:ci \
-            bash -c "cd app && make arm"
+            bash -c "cd app && make arm64"
 
-      - name: Verify ARM binary
+      - name: Verify ARM64 binary
         run: |
           docker run --rm \
             -v "$PWD:/workspace" \
             arm-linux-ci:ci \
-            bash -c "cd app && file sensor-service-arm && file sensor-service-arm | grep -q ARM"
+            bash -c "cd app && file sensor-service-arm64 && file sensor-service-arm64 | grep -q aarch64"
 
-      - name: Upload ARM artifact
+      - name: Upload ARM64 artifact
         uses: actions/upload-artifact@v4
         with:
-          name: sensor-service-arm
-          path: app/sensor-service-arm
+          name: sensor-service-arm64
+          path: app/sensor-service-arm64
+
+  deploy-qemu:
+    needs: build-and-test
+
+    runs-on: [self-hosted, arm-linux, qemu]
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Download ARM64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sensor-service-arm64
+          path: app
+
+      - name: Install deployment dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+
+      - name: Deploy to QEMU
+        env:
+          SSHPASS: ${{ secrets.QEMU_SSH_PASSWORD }}
+        run: |
+          chmod +x scripts/deploy.sh
+          chmod +x app/sensor-service-arm64
+          ./scripts/deploy.sh
