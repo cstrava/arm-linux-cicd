@@ -1,0 +1,13 @@
+[Unit]
+Description=ARM Linux Sensor Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/sensor-service/current/sensor-service --serve
+Restart=on-failure
+RestartSec=2
+User=analog
+
+[Install]
+WantedBy=multi-user.target

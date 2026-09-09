@@ -53,3 +53,20 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# Project-specific files
+app/sensor-service
+app/sensor-service-arm
+app/sensor-service-arm64
+
+# IDE
+.vscode/
+
+# QEMU images
+qemu/images/
+
+# Terraform
+terraform/terraform.tfvars
+.terraform/
+*.tfstate
+*.tfstate.*

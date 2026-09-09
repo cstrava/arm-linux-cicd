@@ -1,0 +1,37 @@
+FROM ubuntu:24.04
+
+RUN apt-get update && \
+    apt-get install -y \
+        curl \
+        git \
+        sudo \
+        ca-certificates \
+        openssh-client \
+        docker.io \
+        jq \
+        libicu-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN useradd -m -s /bin/bash runner && \
+    echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+WORKDIR /home/runner
+
+RUN curl -o actions-runner.tar.gz -L \
+    https://github.com/actions/runner/releases/download/v2.328.0/actions-runner-linux-x64-2.328.0.tar.gz && \
+    mkdir actions-runner && \
+    tar xzf actions-runner.tar.gz -C actions-runner && \
+    rm actions-runner.tar.gz
+
+RUN /home/runner/actions-runner/bin/installdependencies.sh
+
+COPY docker/runner-entrypoint.sh /runner-entrypoint.sh
+
+RUN chmod +x /runner-entrypoint.sh && \
+    chown -R runner:runner /home/runner
+
+USER runner
+
+WORKDIR /home/runner/actions-runner
+
+ENTRYPOINT ["/runner-entrypoint.sh"]
