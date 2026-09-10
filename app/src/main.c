@@ -2,7 +2,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#define VERSION "1.0.0"
+#ifndef VERSION
+#define VERSION "dev"
+#endif
 
 int main(int argc, char const *argv[]) {
   if (argc == 2) {
