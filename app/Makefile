@@ -2,6 +2,8 @@ CC = gcc
 ARM_CC = arm-linux-gnueabihf-gcc
 AARCH64_CC = aarch64-linux-gnu-gcc
 
+VERSION := $(shell cat ../VERSION)
+
 CFLAGS = -Wall -Wextra -Werror
 
 TARGET = sensor-service
@@ -11,13 +13,13 @@ AARCH64_TARGET = sensor-service-arm64
 SRC = src/main.c
 
 all:
-	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
+	$(CC) $(CFLAGS) -DVERSION=\"$(VERSION)\" $(SRC) -o $(TARGET)
 
 arm:
-	$(ARM_CC) $(CFLAGS) $(SRC) -o $(ARM_TARGET)
+	$(ARM_CC) $(CFLAGS) -DVERSION=\"$(VERSION)\" $(SRC) -o $(ARM_TARGET)
 
 arm64:
-	$(AARCH64_CC) $(CFLAGS) $(SRC) -o $(AARCH64_TARGET)
+	$(AARCH64_CC) $(CFLAGS) -DVERSION=\"$(VERSION)\" $(SRC) -o $(AARCH64_TARGET)
 
 test: all
 	cd ../tests && ./test_sensor_service.sh

@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build CI Docker image
+        run: |
+          docker build \
+            -t arm-linux-ci:release \
+            -f docker/Dockerfile .
+
+      - name: Run quality checks
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            arm-linux-ci:release \
+            bash -c "cd app && make quality"
+
+      - name: Build ARM64 application
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            arm-linux-ci:release \
+            bash -c "cd app && make arm64"
+
+      - name: Verify ARM64 binary
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            arm-linux-ci:release \
+            bash -c "cd app && file sensor-service-arm64 && file sensor-service-arm64 | grep -q aarch64"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: app/sensor-service-arm64
